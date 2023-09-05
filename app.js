@@ -8,7 +8,7 @@ const { errors } = require('celebrate');
 
 // const cors = require('cors');
 
-const { PORT = 3000, DB_ADDRESS = 'mongodb://127.0.0.1:27017/bitfilmsdb' } = process.env;
+const { PORT = 4000, DB_ADDRESS = 'mongodb://127.0.0.1:27017/bitfilmsdb' } = process.env;
 
 const errorMiddlewares = require('./middlewares/error');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
@@ -20,7 +20,7 @@ const routes = require('./routes/index');
 const app = express();
 
 // const allowedCors = [
-//   'localhost:3000',
+//   'localhost:4000',
 // ];
 
 // const corsOptions = {
