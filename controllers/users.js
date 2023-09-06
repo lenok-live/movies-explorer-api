@@ -97,11 +97,13 @@ function updateUserInformation(req, res, next) {
       }
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new BadRequest('Неподдерживаемый тип данных.'));
-      } else {
-        next(err);
+      if (err.code === 11000) {
+        return next(new Conflict('Данный Email принадлежит другому пользователю'));
       }
+      if (err.name === 'ValidationError') {
+        return next(new BadRequest('Неподдерживаемый тип данных.'));
+      }
+      return next(err);
     });
 }
 
