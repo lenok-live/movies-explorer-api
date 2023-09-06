@@ -49,7 +49,7 @@ function createMovie(req, res, next) {
       res.status(201).send(movie);
     })
     .catch((error) => {
-      if (error === 'Bad Request') {
+      if (error === 'ValidationError') {
         next(new BadRequest('Неподдерживаемый тип данных'));
       } else {
         next(error);
