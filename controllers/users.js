@@ -3,11 +3,18 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
 
-const NotFound = require('../errors/NotFound');
-const BadRequest = require('../errors/BadRequest');
-const Conflict = require('../errors/Conflict');
+const MESSAGES = require('../utils/constantsMessage');
 
-const { NODE_ENV, JWT_SECRET } = process.env;
+const { registrationSuccess } = MESSAGES[201].users;
+const { unsupportedType, castError } = MESSAGES[400].users;
+const { userNotFound } = MESSAGES[404].users;
+const { emailRegistered } = MESSAGES[409].users;
+
+const BadRequest = require('../errors/BadRequest'); // 400
+const NotFound = require('../errors/NotFound'); // 404
+const Conflict = require('../errors/Conflict'); // 409
+
+const { NODE_ENV, JWT_SECRET } = require('../utils/config');
 
 // POST /signup Создаёт пользователя с переданными в теле email, password и name
 function createUser(req, res, next) {
@@ -32,15 +39,16 @@ function createUser(req, res, next) {
         _id,
         name,
         email,
+        message: registrationSuccess,
       });
     })
     .catch((err) => {
       if (err.code === 11000) {
-        next(new Conflict('Данный email уже зарегистрирован'));
+        next(new Conflict(emailRegistered));
         return;
       }
       if (err.name === 'ValidationError') {
-        next(new BadRequest('Неподдерживаемый тип данных'));
+        next(new BadRequest(unsupportedType));
         return;
       }
       next(err);
@@ -66,14 +74,14 @@ function getUserInformation(req, res, next) {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        throw new NotFound('Запрашиваемый пользователь не найден');
+        throw new NotFound(userNotFound);
       } else {
         res.send(user);
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequest('Проблема со значениями идентификатора объекта.'));
+        next(new BadRequest(castError));
       } else {
         next(err);
       }
@@ -91,17 +99,17 @@ function updateUserInformation(req, res, next) {
   )
     .then((user) => {
       if (!user) {
-        throw NotFound('Запрашиваемый пользователь не найден');
+        throw NotFound(userNotFound);
       } else {
         res.send(user);
       }
     })
     .catch((err) => {
       if (err.code === 11000) {
-        return next(new Conflict('Данный Email принадлежит другому пользователю'));
+        return next(new Conflict(emailRegistered));
       }
       if (err.name === 'ValidationError') {
-        return next(new BadRequest('Неподдерживаемый тип данных.'));
+        return next(new BadRequest(unsupportedType));
       }
       return next(err);
     });

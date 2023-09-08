@@ -1,4 +1,4 @@
-// require('dotenv').config();
+require('dotenv').config();
 
 const express = require('express');
 const mongoose = require('mongoose');
@@ -8,7 +8,8 @@ const { errors } = require('celebrate');
 
 // const cors = require('cors');
 
-const { PORT = 4000, DB_ADDRESS = 'mongodb://127.0.0.1:27017/bitfilmsdb' } = process.env;
+const { PORT = 4000 } = process.env;
+const { DB_ADDRESS } = require('./utils/config');
 
 const errorMiddlewares = require('./middlewares/error');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
@@ -29,7 +30,6 @@ const app = express();
 // };
 
 app.use(helmet());
-app.use(limiter);
 
 // app.use(cors(corsOptions));
 
@@ -42,6 +42,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // подключаем логгер запросов
 app.use(requestLogger);
+
+// Необходимо первым в цепочке подключить логгер, а затем limiter
+app.use(limiter);
 
 // роуты
 app.use(routes);
