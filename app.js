@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 const helmet = require('helmet');
 const { errors } = require('celebrate');
 
-// const cors = require('cors');
+const cors = require('cors');
 
 const { PORT = 4000 } = process.env;
 const { DB_ADDRESS } = require('./utils/config');
@@ -20,18 +20,19 @@ const routes = require('./routes/index');
 
 const app = express();
 
-// const allowedCors = [
-//   'localhost:4000',
-// ];
-
-// const corsOptions = {
-//   'Access-Control-Allow-Origin': allowedCors,
-//   credentials: true,
-// };
-
 app.use(helmet());
 
 // app.use(cors(corsOptions));
+
+app.use(cors({
+  origin:
+    [
+      'http://localhost:3000',
+      'http://moviesul.nomoredomainsrocks.ru',
+      'https://moviesul.nomoredomainsrocks.ru',
+    ],
+  credentials: true,
+}));
 
 // подключаемся к серверу mongo
 mongoose.connect(DB_ADDRESS);
